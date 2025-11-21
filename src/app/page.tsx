@@ -1,59 +1,21 @@
 "use client";
 
-import { useState } from "react";
-import { useConnect, useConnection, useDisconnect } from "wagmi";
+import { ConnectButton } from "@rainbow-me/rainbowkit";
+import { useAccount } from "wagmi";
 import styles from "./page.module.css";
 
 export default function Home() {
-  const { address, status: accountStatus, connector } = useConnection();
-  const {
-    connectAsync,
-    error: connectError,
-    isPending: isConnectPending,
-  } = useConnect();
-  const { disconnectAsync, isPending: isDisconnectPending } = useDisconnect();
-
-  const [localError, setLocalError] = useState<string | null>(null);
-
-  const handleConnect = async () => {
-    if (!connector) {
-      setLocalError("No connector found. Please install a web3 wallet.");
-      return;
-    }
-
-    if (typeof connector.ready === "boolean" && !connector.ready) {
-      setLocalError("Wallet is not available. Open the extension and retry.");
-      return;
-    }
-
-    setLocalError(null);
-
-    try {
-      // async usage is important to be handled in catch
-      await connectAsync({ connector });
-    } catch (err) {
-      setLocalError(err instanceof Error ? err.message : "Failed to connect wallet.");
-    }
-  };
-
-  const handleDisconnect = async () => {
-    setLocalError(null);
-    try {
-      // async usage is important to be handled in catch
-      await disconnectAsync();
-    } catch (err) {
-      setLocalError(
-        err instanceof Error ? err.message : "Failed to disconnect wallet."
-      );
-    }
-  };
-
+  const { address, status } = useAccount();
   const formattedAddress =
     address && `${address.slice(0, 6)}…${address.slice(-4)}`;
 
-  const isConnected = accountStatus === "connected";
-  const isLoading = isConnectPending || isDisconnectPending;
-  const errorMessage = localError ?? connectError?.message ?? null;
+  const isConnected = status === "connected";
+  const statusMessage =
+    status === "connecting" || status === "reconnecting"
+      ? "Connecting..."
+      : isConnected
+        ? "Wallet connected"
+        : "Not connected";
 
   return (
     <div className={styles.page}>
@@ -71,7 +33,7 @@ export default function Home() {
           <div className={styles.status}>
             <p className={styles.label}>Status</p>
             <p className={isConnected ? styles.connected : styles.disconnected}>
-              {isConnected ? "Wallet connected" : "Not connected"}
+              {statusMessage}
             </p>
           </div>
 
@@ -82,26 +44,12 @@ export default function Home() {
             </div>
           )}
 
-          {errorMessage && <p className={styles.error}>{errorMessage}</p>}
-
           <div className={styles.actions}>
-            {!isConnected ? (
-              <button
-                className={styles.primaryButton}
-                onClick={handleConnect}
-                disabled={isLoading}
-              >
-                {isConnectPending ? "Connecting..." : "Connect wallet"}
-              </button>
-            ) : (
-              <button
-                className={styles.secondaryButton}
-                onClick={handleDisconnect}
-                disabled={isLoading}
-              >
-                {isDisconnectPending ? "Disconnecting..." : "Disconnect"}
-              </button>
-            )}
+            <ConnectButton
+              accountStatus={{ smallScreen: "avatar", largeScreen: "full" }}
+              chainStatus="icon"
+              showBalance={false}
+            />
           </div>
         </div>
       </main>

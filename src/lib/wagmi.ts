@@ -1,10 +1,15 @@
-import { createConfig, http } from "wagmi";
+import { getDefaultConfig } from "@rainbow-me/rainbowkit";
+import { http } from "wagmi";
 import { mainnet } from "wagmi/chains";
-import { injected } from "wagmi/connectors";
 
-export const wagmiConfig = createConfig({
+const projectId =
+  process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID ||
+  "00000000000000000000000000000000";
+
+export const wagmiConfig = getDefaultConfig({
+  appName: "Web3 Wallet Connect",
+  projectId,
   chains: [mainnet],
-  connectors: [injected()],
   transports: {
     [mainnet.id]: http(),
   },
