@@ -14,8 +14,8 @@ export default function Home() {
     status === "connecting" || status === "reconnecting"
       ? "Connecting..."
       : isConnected
-        ? "Wallet connected"
-        : "Not connected";
+      ? "Wallet connected"
+      : "Not connected";
 
   return (
     <div className={styles.page}>
@@ -24,8 +24,8 @@ export default function Home() {
           <p className={styles.tag}>web3</p>
           <h1>Connect your wallet</h1>
           <p className={styles.lead}>
-            Click “Connect”, confirm the request in your extension, and a snippet
-            of your address will show below.
+            Click “Connect”, confirm the request in your extension, and a
+            snippet of your address will show below.
           </p>
         </div>
 
@@ -47,8 +47,8 @@ export default function Home() {
           <div className={styles.actions}>
             <ConnectButton
               accountStatus={{ smallScreen: "avatar", largeScreen: "full" }}
-              chainStatus="icon"
-              showBalance={false}
+              chainStatus={{ smallScreen: "icon", largeScreen: "full" }}
+              showBalance={true}
             />
           </div>
         </div>
