@@ -1,56 +1,49 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { useConnect, useConnectors, useConnection, useDisconnect } from "wagmi";
+import { useState } from "react";
+import { useConnect, useConnection, useDisconnect } from "wagmi";
 import styles from "./page.module.css";
 
 export default function Home() {
-  const { address, status: accountStatus } = useConnection();
-  const { connectAsync, error: connectError, isPending: isConnectPending } =
-    useConnect();
+  const { address, status: accountStatus, connector } = useConnection();
+  const {
+    connectAsync,
+    error: connectError,
+    isPending: isConnectPending,
+  } = useConnect();
   const { disconnectAsync, isPending: isDisconnectPending } = useDisconnect();
-  const connectors = useConnectors();
 
   const [localError, setLocalError] = useState<string | null>(null);
 
-  const connector = useMemo(() => {
-    if (!connectors.length) return null;
-    return (
-      connectors.find((item) => item.id === "injected") ??
-      connectors.find((item) => item.type === "injected") ??
-      connectors[0]
-    );
-  }, [connectors]);
-
   const handleConnect = async () => {
     if (!connector) {
-      setLocalError("Не найден ни один коннектор. Установите web3-кошелек.");
+      setLocalError("No connector found. Please install a web3 wallet.");
       return;
     }
 
     if (typeof connector.ready === "boolean" && !connector.ready) {
-      setLocalError("Кошелек не доступен. Откройте расширение и попробуйте снова.");
+      setLocalError("Wallet is not available. Open the extension and retry.");
       return;
     }
 
     setLocalError(null);
 
     try {
+      // async usage is important to be handled in catch
       await connectAsync({ connector });
     } catch (err) {
-      setLocalError(
-        err instanceof Error ? err.message : "Не удалось подключить кошелек."
-      );
+      setLocalError(err instanceof Error ? err.message : "Failed to connect wallet.");
     }
   };
 
   const handleDisconnect = async () => {
     setLocalError(null);
     try {
+      // async usage is important to be handled in catch
       await disconnectAsync();
     } catch (err) {
       setLocalError(
-        err instanceof Error ? err.message : "Не удалось отключить кошелек."
+        err instanceof Error ? err.message : "Failed to disconnect wallet."
       );
     }
   };
@@ -67,24 +60,24 @@ export default function Home() {
       <main className={styles.card}>
         <div className={styles.heading}>
           <p className={styles.tag}>web3</p>
-          <h1>Подключите свой кошелек</h1>
+          <h1>Connect your wallet</h1>
           <p className={styles.lead}>
-            Нажмите «Подключить», подтвердите действие в расширении, затем
-            кусочек адреса появится ниже.
+            Click “Connect”, confirm the request in your extension, and a snippet
+            of your address will show below.
           </p>
         </div>
 
         <div className={styles.content}>
           <div className={styles.status}>
-            <p className={styles.label}>Статус</p>
+            <p className={styles.label}>Status</p>
             <p className={isConnected ? styles.connected : styles.disconnected}>
-              {isConnected ? "Кошелек подключен" : "Не подключен"}
+              {isConnected ? "Wallet connected" : "Not connected"}
             </p>
           </div>
 
           {isConnected && formattedAddress && (
             <div className={styles.addressBlock}>
-              <p className={styles.label}>Адрес</p>
+              <p className={styles.label}>Address</p>
               <p className={styles.address}>{formattedAddress}</p>
             </div>
           )}
@@ -98,7 +91,7 @@ export default function Home() {
                 onClick={handleConnect}
                 disabled={isLoading}
               >
-                {isConnectPending ? "Подключаем..." : "Подключить кошелек"}
+                {isConnectPending ? "Connecting..." : "Connect wallet"}
               </button>
             ) : (
               <button
@@ -106,7 +99,7 @@ export default function Home() {
                 onClick={handleDisconnect}
                 disabled={isLoading}
               >
-                {isDisconnectPending ? "Отключаем..." : "Отключить"}
+                {isDisconnectPending ? "Disconnecting..." : "Disconnect"}
               </button>
             )}
           </div>
