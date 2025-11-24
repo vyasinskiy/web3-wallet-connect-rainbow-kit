@@ -19,8 +19,10 @@ model Nonce {
   used      Boolean  @default(false)
   expiresAt DateTime
   createdAt DateTime @default(now())
+  // nonce is created for specific wallet
   walletId  Int
   wallet    Wallet   @relation(fields: [walletId], references: [id], onDelete: Cascade)
+  signatures Signature[]
 }
 
 model Wallet {
@@ -30,4 +32,16 @@ model Wallet {
   userId    Int
   user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
   nonces    Nonce[]
+  signatures Signature[]
+}
+
+model Signature {
+  id        Int      @id @default(autoincrement())
+  message   String
+  signature String
+  createdAt DateTime @default(now())
+  walletId  Int
+  wallet    Wallet   @relation(fields: [walletId], references: [id], onDelete: Cascade)
+  nonceId   Int?
+  nonce     Nonce?   @relation(fields: [nonceId], references: [id], onDelete: SetNull)
 }

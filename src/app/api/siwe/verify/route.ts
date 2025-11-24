@@ -73,6 +73,24 @@ export async function POST(req: Request) {
     data: { used: true },
   });
 
+  // Ensure wallet has a user (edge-case for legacy data)
+  if (!nonceRecord.wallet.userId) {
+    const newUser = await prisma.user.create({ data: {} });
+    await prisma.wallet.update({
+      where: { id: nonceRecord.wallet.id },
+      data: { userId: newUser.id },
+    });
+  }
+
+  await prisma.signature.create({
+    data: {
+      message,
+      signature,
+      walletId: nonceRecord.wallet.id,
+      nonceId: nonceRecord.id,
+    },
+  });
+
   cookieStore.set(
     siweCookies.session,
     createSessionToken(address),
