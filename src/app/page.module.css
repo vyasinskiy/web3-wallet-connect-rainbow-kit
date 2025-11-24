@@ -118,6 +118,29 @@
   justify-content: flex-start;
 }
 
+.authBlock {
+  margin-top: 16px;
+  padding: 16px;
+  border-radius: 14px;
+  border: 1px dashed var(--card-border);
+  background: rgba(255, 255, 255, 0.02);
+  display: grid;
+  gap: 10px;
+}
+
+.authHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.sessionAddress {
+  margin: 0;
+  color: var(--text);
+  font-family: var(--font-geist-mono);
+  font-size: 15px;
+}
+
 .primaryButton,
 .secondaryButton {
   appearance: none;
