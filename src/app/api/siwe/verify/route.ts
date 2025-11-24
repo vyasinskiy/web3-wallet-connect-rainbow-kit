@@ -29,12 +29,14 @@ export async function POST(req: Request) {
 
   const nonceRecord = await prisma.nonce.findUnique({
     where: { value: nonce },
+    include: { wallet: { include: { user: true } } },
   });
 
   if (
     !nonceRecord ||
     nonceRecord.used ||
-    nonceRecord.expiresAt.getTime() < Date.now()
+    nonceRecord.expiresAt.getTime() < Date.now() ||
+    !nonceRecord.wallet
   ) {
     cookieStore.set(siweCookies.nonce, "", clearCookieOptions());
     return Response.json({ error: "Nonce not found or expired." }, { status: 400 });
@@ -56,22 +58,19 @@ export async function POST(req: Request) {
     time: new Date().toISOString(),
   });
 
-  if (!verification.success) {
+  const address = siweMessage.address.toLowerCase();
+
+  if (
+    !verification.success ||
+    nonceRecord.wallet.address.toLowerCase() !== address
+  ) {
     cookieStore.set(siweCookies.nonce, "", clearCookieOptions());
     return Response.json({ error: "Invalid SIWE signature." }, { status: 422 });
   }
 
-  const address = siweMessage.address.toLowerCase();
-
   await prisma.nonce.update({
     where: { value: nonce },
     data: { used: true },
-  });
-
-  await prisma.user.upsert({
-    where: { address },
-    create: { address },
-    update: {},
   });
 
   cookieStore.set(

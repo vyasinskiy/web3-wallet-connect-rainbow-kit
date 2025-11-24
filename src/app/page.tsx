@@ -67,7 +67,11 @@ export default function Home() {
     setSiweError(null);
 
     try {
-      const nonceRes = await fetch("/api/siwe/nonce");
+      const nonceRes = await fetch("/api/siwe/nonce", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ address }),
+      });
       const { nonce } = await nonceRes.json();
 
       const message = new SiweMessage({

@@ -9,8 +9,8 @@ datasource db {
 
 model User {
   id        Int      @id @default(autoincrement())
-  address   String   @unique
   createdAt DateTime @default(now())
+  wallets   Wallet[]
 }
 
 model Nonce {
@@ -19,4 +19,15 @@ model Nonce {
   used      Boolean  @default(false)
   expiresAt DateTime
   createdAt DateTime @default(now())
+  walletId  Int
+  wallet    Wallet   @relation(fields: [walletId], references: [id], onDelete: Cascade)
+}
+
+model Wallet {
+  id        Int      @id @default(autoincrement())
+  address   String   @unique
+  createdAt DateTime @default(now())
+  userId    Int
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  nonces    Nonce[]
 }
