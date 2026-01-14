@@ -5,6 +5,7 @@ import { SiweMessage } from "siwe";
 import { ConnectButton } from "@rainbow-me/rainbowkit";
 import { useAccount, useChainId, useSignMessage } from "wagmi";
 import styles from "./page.module.css";
+import { CounterPanel } from "./components/CounterPanel";
 
 export default function Home() {
   const { address, status } = useAccount();
@@ -204,6 +205,14 @@ export default function Home() {
                   : "Sign-In with Ethereum"}
             </button>
           </div>
+
+          {isSiweSignedIn && (
+            <CounterPanel
+              isConnected={isConnected}
+              chainId={chainId}
+            />
+          )}
+
         </div>
       </main>
     </div>

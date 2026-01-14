@@ -7,15 +7,18 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
+    "hh:compile": "hardhat compile",
+    "hh:node": "hardhat node",
+    "hh:deploy": "hardhat run scripts/deployCounter.js --network localhost",
     "db:generate": "prisma generate",
     "db:push": "prisma db push",
     "db:studio": "prisma studio",
     "verify:signature": "node scripts/verifySignature.mjs"
   },
   "dependencies": {
+    "@prisma/client": "^5.22.0",
     "@rainbow-me/rainbowkit": "^2.2.9",
     "@tanstack/react-query": "^5.90.10",
-    "@prisma/client": "^5.22.0",
     "cookie": "^1.0.2",
     "next": "^16",
     "prisma": "^5.22.0",
@@ -26,11 +29,14 @@
     "wagmi": "^2.19.5"
   },
   "devDependencies": {
+    "@nomicfoundation/hardhat-toolbox": "^5.0.0",
     "@types/node": "^20",
     "@types/react": "^18",
     "@types/react-dom": "^18",
+    "@wagmi/cli": "^2.8.0",
     "eslint": "^9",
     "eslint-config-next": "15.1.6",
+    "hardhat": "^2.22.3",
     "typescript": "^5"
   }
 }
