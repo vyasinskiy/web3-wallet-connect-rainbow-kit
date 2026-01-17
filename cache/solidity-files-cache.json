@@ -2,8 +2,8 @@
   "_format": "hh-sol-cache-2",
   "files": {
     "/Users/usuario/code/web3-wallet-connect-rainbow-kit/contracts/Counter.sol": {
-      "lastModificationDate": 1767815152331,
-      "contentHash": "84341ebc82d029b78bfc522b91925985",
+      "lastModificationDate": 1768501378197,
+      "contentHash": "afb948cfd7b3e519dac717b6c5518b5c",
       "sourceName": "contracts/Counter.sol",
       "solcConfig": {
         "version": "0.8.20",

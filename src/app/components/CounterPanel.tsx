@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import {
   useReadContract,
   useWaitForTransactionReceipt,
@@ -8,6 +8,7 @@ import {
 } from "wagmi";
 import styles from "../page.module.css";
 import { counterAbi } from "@/generated/wagmi";
+import { MulticallPanel } from "./MulticallPanel";
 
 type CounterPanelProps = {
   isConnected: boolean;
@@ -22,6 +23,7 @@ export function CounterPanel({
   const [customValue, setCustomValue] = useState("0");
   const [counterError, setCounterError] = useState<string | null>(null);
   const [txHash, setTxHash] = useState<`0x${string}` | null>(null);
+  const [batchPending, setBatchPending] = useState(false);
 
   const counterAddress = process.env
     .NEXT_PUBLIC_COUNTER_ADDRESS as `0x${string}` | undefined;
@@ -113,7 +115,7 @@ export function CounterPanel({
 
   const countValue =
     typeof countData === "bigint" ? countData.toString() : "0";
-  const counterBusy = isWritePending || isTxLoading;
+  const counterBusy = isWritePending || isTxLoading || batchPending;
 
   return (
     <div className={styles.counterBlock}>
@@ -178,6 +180,14 @@ export function CounterPanel({
               Set
             </button>
           </div>
+          <MulticallPanel
+            counterAddress={counterAddress!}
+            counterChainId={counterChainId}
+            isCounterReady={isCounterReady}
+            isBusy={counterBusy}
+            onPendingChange={setBatchPending}
+            onRefetch={refetchCount}
+          />
         </>
       ) : (
         <p className={styles.disconnected}>
