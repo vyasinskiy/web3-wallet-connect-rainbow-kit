@@ -11,6 +11,8 @@ type MulticallPanelProps = {
   counterChainId: number;
   isCounterReady: boolean;
   isBusy: boolean;
+  isTipValid: boolean;
+  tipWei?: bigint;
   onPendingChange: (pending: boolean) => void;
   onRefetch: () => void;
 };
@@ -20,6 +22,8 @@ export function MulticallPanel({
   counterChainId,
   isCounterReady,
   isBusy,
+  isTipValid,
+  tipWei,
   onPendingChange,
   onRefetch,
 }: MulticallPanelProps) {
@@ -47,6 +51,14 @@ export function MulticallPanel({
       return;
     }
 
+    if (!isTipValid) {
+      setBatchError("Fix the tip amount before sending.");
+      return;
+    }
+
+    const gasTip =
+      tipWei && tipWei > 0n ? { maxPriorityFeePerGas: tipWei } : {};
+
     setBatchError(null);
     setPendingState(true);
     try {
@@ -56,6 +68,7 @@ export function MulticallPanel({
           address: counterAddress,
           abi: counterAbi,
           functionName: "increment",
+          ...gasTip,
         });
         const firstReceipt = await publicClient.waitForTransactionReceipt({
           hash: firstHash,
@@ -65,6 +78,7 @@ export function MulticallPanel({
           address: counterAddress,
           abi: counterAbi,
           functionName: "increment",
+          ...gasTip,
         });
         const secondReceipt = await publicClient.waitForTransactionReceipt({
           hash: secondHash,
@@ -88,6 +102,7 @@ export function MulticallPanel({
           abi: counterAbi,
           functionName: "multicall",
           args: [data],
+          ...gasTip,
         });
         const receipt = await publicClient.waitForTransactionReceipt({ hash });
         setMulticallGasUsed(receipt.gasUsed);
@@ -141,7 +156,7 @@ export function MulticallPanel({
       <button
         className={styles.primaryButton}
         onClick={handleBatchIncrement}
-        disabled={!isCounterReady || isBusy || batchPending}
+        disabled={!isCounterReady || isBusy || batchPending || !isTipValid}
       >
         {batchMode === "separate" ? "Send 2 transactions" : "Send multicall"}
       </button>
